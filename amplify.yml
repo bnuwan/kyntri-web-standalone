@@ -3,10 +3,14 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm install
+        - echo "Starting dependency installation..."
+        - npm install --no-audit --no-fund --prefer-offline
+        - echo "Dependencies installed successfully"
     build:
       commands:
+        - echo "Starting build process..."
         - npm run build
+        - echo "Build completed successfully"
   artifacts:
     baseDirectory: dist
     files:
