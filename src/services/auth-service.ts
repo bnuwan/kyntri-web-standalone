@@ -14,20 +14,12 @@ export interface LoginCredentials {
   password: string;
 }
 
-// Debug environment variables
-console.log('Environment variables:', {
-  userPoolId: import.meta.env.VITE_USER_POOL_ID,
-  userPoolClientId: import.meta.env.VITE_USER_POOL_CLIENT_ID,
-  region: import.meta.env.VITE_AWS_REGION,
-  environment: import.meta.env.VITE_APP_ENVIRONMENT,
-});
-
-// Configure Amplify
+// AWS Cognito Configuration - Using direct values for Amplify deployment
 const awsConfig = {
   Auth: {
     Cognito: {
-      userPoolId: import.meta.env.VITE_USER_POOL_ID || 'us-east-2_QUcFgSO9U',
-      userPoolClientId: import.meta.env.VITE_USER_POOL_CLIENT_ID || '6tcpkqhdhu8sdm4f2ofis5a9v4',
+      userPoolId: 'us-east-2_QUcFgSO9U',
+      userPoolClientId: '6tcpkqhdhu8sdm4f2ofis5a9v4',
     },
   },
 } as any;
