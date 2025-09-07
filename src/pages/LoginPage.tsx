@@ -104,8 +104,8 @@ function AnimatedBackground() {
 
 export function LoginPage() {
   const { login, isLoading } = useAuth();
-  const [username, setUsername] = React.useState('admin');
-  const [password, setPassword] = React.useState('AdminPass123!');
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
   const [rememberMe, setRememberMe] = React.useState(false);
@@ -492,24 +492,6 @@ export function LoginPage() {
             </button>
           </form>
           
-          <div style={{ 
-            marginTop: '24px', 
-            padding: '16px', 
-            backgroundColor: '#f8fafc',
-            border: '1px solid #e2e8f0', 
-            borderRadius: '12px',
-            fontSize: '12px'
-          }}>
-            <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-              <strong style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>Demo Credentials</strong>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '12px' }}>
-              <div style={{ color: '#64748b' }}>Username:</div>
-              <div style={{ fontFamily: 'Inter, monospace', color: '#1e293b', fontWeight: '600' }}>admin</div>
-              <div style={{ color: '#64748b' }}>Password:</div>
-              <div style={{ fontFamily: 'Inter, monospace', color: '#1e293b', fontWeight: '600' }}>AdminPass123!</div>
-            </div>
-          </div>
         </div>
       </div>
     </>

@@ -18,12 +18,12 @@ export interface LoginCredentials {
 const awsConfig = {
   Auth: {
     Cognito: {
-      userPoolId: import.meta.env.VITE_USER_POOL_ID || 'mock-pool-id',
-      userPoolClientId: import.meta.env.VITE_USER_POOL_CLIENT_ID || 'mock-client-id',
-      identityPoolId: import.meta.env.VITE_IDENTITY_POOL_ID || 'mock-identity-pool-id',
+      userPoolId: import.meta.env.VITE_USER_POOL_ID,
+      userPoolClientId: import.meta.env.VITE_USER_POOL_CLIENT_ID,
+      region: import.meta.env.VITE_AWS_REGION,
       loginWith: {
         email: true,
-        username: false,
+        username: true,
       },
       signUpVerificationMethod: 'code' as const,
       userAttributes: {
@@ -31,7 +31,7 @@ const awsConfig = {
           required: true,
         },
         name: {
-          required: true,
+          required: false,
         },
       },
       allowGuestAccess: false,
