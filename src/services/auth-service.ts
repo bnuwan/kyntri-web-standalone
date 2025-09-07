@@ -14,39 +14,32 @@ export interface LoginCredentials {
   password: string;
 }
 
+// Debug environment variables
+console.log('Environment variables:', {
+  userPoolId: import.meta.env.VITE_USER_POOL_ID,
+  userPoolClientId: import.meta.env.VITE_USER_POOL_CLIENT_ID,
+  region: import.meta.env.VITE_AWS_REGION,
+  environment: import.meta.env.VITE_APP_ENVIRONMENT,
+});
+
 // Configure Amplify
 const awsConfig = {
   Auth: {
     Cognito: {
-      userPoolId: import.meta.env.VITE_USER_POOL_ID,
-      userPoolClientId: import.meta.env.VITE_USER_POOL_CLIENT_ID,
-      region: import.meta.env.VITE_AWS_REGION,
-      loginWith: {
-        email: true,
-        username: true,
-      },
-      signUpVerificationMethod: 'code' as const,
-      userAttributes: {
-        email: {
-          required: true,
-        },
-        name: {
-          required: false,
-        },
-      },
-      allowGuestAccess: false,
-      passwordFormat: {
-        minLength: 8,
-        requireLowercase: true,
-        requireUppercase: true,
-        requireNumbers: true,
-        requireSpecialCharacters: true,
-      },
+      userPoolId: import.meta.env.VITE_USER_POOL_ID || 'us-east-2_QUcFgSO9U',
+      userPoolClientId: import.meta.env.VITE_USER_POOL_CLIENT_ID || '6tcpkqhdhu8sdm4f2ofis5a9v4',
     },
   },
-};
+} as any;
 
-Amplify.configure(awsConfig);
+console.log('AWS Config:', awsConfig);
+
+try {
+  Amplify.configure(awsConfig);
+  console.log('Amplify configured successfully');
+} catch (error) {
+  console.error('Failed to configure Amplify:', error);
+}
 
 export class AuthService {
   async login({ username, password }: LoginCredentials): Promise<AuthUser> {
