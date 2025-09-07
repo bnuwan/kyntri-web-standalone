@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#4f46e5" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Kyntri" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="Kyntri" />
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="AI-assisted EHS Safety Platform for incident reporting, CAPA management, inspections, and permits." />
+    <meta name="keywords" content="EHS, safety, incident reporting, compliance, workplace safety" />
+    <meta name="author" content="Kyntri" />
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Kyntri - EHS Safety Platform" />
+    <meta property="og:description" content="AI-assisted EHS Safety Platform for incident reporting and management" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:url" content="https://app.kyntri.com" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Kyntri - EHS Safety Platform" />
+    <meta name="twitter:description" content="AI-assisted EHS Safety Platform for incident reporting and management" />
+    <meta name="twitter:image" content="/og-image.png" />
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#4f46e5" />
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    
+    <!-- Content Security Policy (adjust domains as needed) -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: https:;
+      connect-src 'self' https://api.kyntri.com wss://api.kyntri.com https://cognito-idp.us-east-2.amazonaws.com https://cognito-identity.us-east-2.amazonaws.com;
+      manifest-src 'self';
+    " />
+    
+    <title>Kyntri - EHS Safety Platform</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Offline fallback -->
+    <noscript>
+      <div style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        font-family: system-ui, sans-serif;
+        text-align: center;
+        background-color: #f8fafc;
+        color: #1f2937;
+      ">
+        <div>
+          <h1>JavaScript Required</h1>
+          <p>Please enable JavaScript to use Kyntri EHS Safety Platform.</p>
+        </div>
+      </div>
+    </noscript>
+  </body>
+</html>
