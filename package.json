@@ -10,8 +10,13 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@aws-amplify/auth": "^6.0.0",
+    "aws-amplify": "^6.0.0",
+    "nodeman": "^1.1.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.1",
+    "zustand": "^4.4.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
