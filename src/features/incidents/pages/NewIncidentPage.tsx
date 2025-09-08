@@ -71,8 +71,8 @@ export const NewIncidentPage: React.FC = () => {
 
       toast.success('Incident reported successfully');
       
-      // Navigate to the incident detail page or incidents list
-      navigate('/incidents', { 
+      // Navigate back to dashboard after successful submission
+      navigate('/dashboard', { 
         replace: true,
         state: { newIncidentId: incident.id }
       });
@@ -85,7 +85,7 @@ export const NewIncidentPage: React.FC = () => {
   const handleCancel = () => {
     if (window.confirm('Discard this incident report? All information will be lost.')) {
       reset();
-      navigate('/incidents');
+      navigate('/dashboard');
     }
   };
 
@@ -134,7 +134,7 @@ export const NewIncidentPage: React.FC = () => {
             <div className="flex items-center space-x-3">
               <button
                 type="button"
-                onClick={() => navigate('/incidents')}
+                onClick={() => navigate('/dashboard')}
                 className="p-2 -ml-2 text-gray-400 hover:text-gray-600 rounded-md"
               >
                 <ArrowLeft className="h-5 w-5" />

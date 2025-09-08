@@ -434,7 +434,7 @@ export function DashboardPage() {
             gap: '16px'
           }}>
             {[
-              { title: 'Report Incident', icon: '📝', color: '#ef4444', path: '/incidents/new' },
+              { title: 'Report Incident', icon: '📝', color: '#ef4444', path: '/incidents' },
               { title: 'View Incidents', icon: '📋', color: '#3b82f6', path: '/incidents' },
               { title: 'Safety Inspection', icon: '🔍', color: '#f59e0b', path: '#' },
               { title: 'Equipment Check', icon: '⚙️', color: '#10b981', path: '#' },
@@ -485,7 +485,7 @@ export function DashboardPage() {
       
       {/* Floating Report Incident Button */}
       <button
-        onClick={() => navigate('/incidents/new')}
+        onClick={() => navigate('/incidents')}
         style={{
           position: 'fixed',
           bottom: '24px',
