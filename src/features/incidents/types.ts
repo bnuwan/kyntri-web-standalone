@@ -67,7 +67,7 @@ export const IncidentFiltersSchema = z.object({
   to: z.string().datetime().optional(),
   q: z.string().optional(),
   pageKey: z.string().optional(),
-  limit: z.number().int().min(1).max(100).default(20)
+  limit: z.number().int().min(1).max(100).default(20).optional()
 });
 
 // TypeScript types

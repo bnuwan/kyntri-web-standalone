@@ -1,6 +1,7 @@
 import { apiClient } from '../../lib/api-client';
 import { mockSites, mockAssets, mockIncidents, mockActions, delay } from '../../lib/mock-data';
-import { supabaseIncidentsApi } from './api-supabase';
+// Conditional import of Supabase API to avoid initialization errors
+let supabaseIncidentsApi: any = null;
 import {
   Incident,
   IncidentCreate,
@@ -18,11 +19,26 @@ import {
 const USE_SUPABASE = import.meta.env.VITE_USE_SUPABASE === 'true';
 const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true' || (!USE_SUPABASE && import.meta.env.DEV);
 
+// Lazy load Supabase API to avoid initialization errors
+async function getSupabaseApi() {
+  if (!supabaseIncidentsApi && USE_SUPABASE) {
+    try {
+      const { supabaseIncidentsApi: api } = await import('./api-supabase');
+      supabaseIncidentsApi = api;
+    } catch (error) {
+      console.error('Failed to load Supabase API:', error);
+      throw new Error('Supabase configuration error. Please check your environment variables.');
+    }
+  }
+  return supabaseIncidentsApi;
+}
+
 export class IncidentsApi {
   // Health check
   async health(): Promise<{ ok: boolean }> {
     if (USE_SUPABASE) {
-      return supabaseIncidentsApi.health();
+      const api = await getSupabaseApi();
+      return api.health();
     }
     return apiClient.get('/health');
   }
@@ -35,7 +51,8 @@ export class IncidentsApi {
   // Incidents
   async getIncidents(filters: IncidentFilters = {}): Promise<IncidentListResponse> {
     if (USE_SUPABASE) {
-      return supabaseIncidentsApi.getIncidents(filters);
+      const api = await getSupabaseApi();
+      return api.getIncidents(filters);
     }
     
     if (USE_MOCK_DATA) {
@@ -83,7 +100,8 @@ export class IncidentsApi {
 
   async getIncident(id: string): Promise<Incident> {
     if (USE_SUPABASE) {
-      return supabaseIncidentsApi.getIncident(id);
+      const api = await getSupabaseApi();
+      return api.getIncident(id);
     }
     if (USE_MOCK_DATA) {
       await delay(400);
@@ -98,7 +116,8 @@ export class IncidentsApi {
 
   async createIncident(incident: IncidentCreate): Promise<{ id: string; status: string }> {
     if (USE_SUPABASE) {
-      return supabaseIncidentsApi.createIncident(incident);
+      const api = await getSupabaseApi();
+      return api.createIncident(incident);
     }
     if (USE_MOCK_DATA) {
       await delay(1000);
@@ -159,7 +178,8 @@ export class IncidentsApi {
   // Sites
   async getSites(): Promise<Site[]> {
     if (USE_SUPABASE) {
-      return supabaseIncidentsApi.getSites();
+      const api = await getSupabaseApi();
+      return api.getSites();
     }
     if (USE_MOCK_DATA) {
       await delay(500);
@@ -175,7 +195,8 @@ export class IncidentsApi {
   // Assets
   async getAssets(siteId?: string): Promise<Asset[]> {
     if (USE_SUPABASE) {
-      return supabaseIncidentsApi.getAssets(siteId);
+      const api = await getSupabaseApi();
+      return api.getAssets(siteId);
     }
     if (USE_MOCK_DATA) {
       await delay(300);
@@ -195,7 +216,8 @@ export class IncidentsApi {
     onProgress?: (progress: number) => void
   ): Promise<{ bucketKey: string; contentType: string; size: number }> {
     if (USE_SUPABASE) {
-      return supabaseIncidentsApi.uploadFile(file, onProgress);
+      const api = await getSupabaseApi();
+      return api.uploadFile(file, onProgress);
     }
 
     // Get presigned URL
@@ -226,7 +248,8 @@ export class IncidentsApi {
     if (files.length === 0) return [];
 
     if (USE_SUPABASE) {
-      return supabaseIncidentsApi.uploadFiles(files, onProgress);
+      const api = await getSupabaseApi();
+      return api.uploadFiles(files, onProgress);
     }
 
     // Get presigned URLs for all files
