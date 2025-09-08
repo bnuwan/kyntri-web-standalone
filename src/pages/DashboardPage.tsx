@@ -1,7 +1,9 @@
 import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 export function DashboardPage() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
@@ -232,13 +234,18 @@ export function DashboardPage() {
             gap: '16px'
           }}>
             {[
-              { title: 'Report Incident', icon: '📝', color: '#ef4444' },
-              { title: 'Safety Inspection', icon: '🔍', color: '#f59e0b' },
-              { title: 'Training Module', icon: '📚', color: '#3b82f6' },
-              { title: 'Equipment Check', icon: '⚙️', color: '#10b981' },
+              { title: 'Report Incident', icon: '📝', color: '#ef4444', path: '/incidents/new' },
+              { title: 'View Incidents', icon: '📋', color: '#3b82f6', path: '/incidents' },
+              { title: 'Safety Inspection', icon: '🔍', color: '#f59e0b', path: '#' },
+              { title: 'Equipment Check', icon: '⚙️', color: '#10b981', path: '#' },
             ].map((action, index) => (
               <button
                 key={index}
+                onClick={() => {
+                  if (action.path !== '#') {
+                    navigate(action.path);
+                  }
+                }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -249,16 +256,21 @@ export function DashboardPage() {
                   fontSize: '14px',
                   fontWeight: '500',
                   color: action.color,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
+                  cursor: action.path !== '#' ? 'pointer' : 'default',
+                  transition: 'all 0.2s ease',
+                  opacity: action.path === '#' ? 0.6 : 1
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = `${action.color}20`;
-                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  if (action.path !== '#') {
+                    e.currentTarget.style.backgroundColor = `${action.color}20`;
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = `${action.color}10`;
-                  e.currentTarget.style.transform = 'translateY(0)';
+                  if (action.path !== '#') {
+                    e.currentTarget.style.backgroundColor = `${action.color}10`;
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }
                 }}
               >
                 <span style={{ fontSize: '20px', marginRight: '12px' }}>

@@ -1,8 +1,14 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './hooks/useAuth';
+import { useAuth } from './hooks/useAuth';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { AppProviders } from './app/AppProviders';
+
+// Incident pages
+import { IncidentsListPage } from './features/incidents/pages/IncidentsListPage';
+import { NewIncidentPage } from './features/incidents/pages/NewIncidentPage';
+import { IncidentDetailPage } from './features/incidents/pages/IncidentDetailPage';
 
 function AppRoutes() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -58,6 +64,33 @@ function AppRoutes() {
           </ProtectedRoute>
         } 
       />
+      
+      {/* Incident routes */}
+      <Route 
+        path="/incidents" 
+        element={
+          <ProtectedRoute>
+            <IncidentsListPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/incidents/new" 
+        element={
+          <ProtectedRoute>
+            <NewIncidentPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/incidents/:id" 
+        element={
+          <ProtectedRoute>
+            <IncidentDetailPage />
+          </ProtectedRoute>
+        } 
+      />
+      
       <Route 
         path="/" 
         element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} 
@@ -69,9 +102,9 @@ function AppRoutes() {
 function App() {
   return (
     <Router>
-      <AuthProvider>
+      <AppProviders>
         <AppRoutes />
-      </AuthProvider>
+      </AppProviders>
     </Router>
   );
 }
