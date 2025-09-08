@@ -1,9 +1,30 @@
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { useIncidents, useOutboxStatus } from '../features/incidents/hooks';
 
 export function DashboardPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  
+  // Fetch incident data for dashboard stats
+  const { data: incidentsData, isLoading: incidentsLoading } = useIncidents();
+  const { data: outboxStatus } = useOutboxStatus();
+  
+  const incidents = incidentsData?.pages?.flatMap(page => page.incidents) || [];
+  
+  // Calculate incident statistics
+  const incidentStats = {
+    total: incidents.length,
+    open: incidents.filter(i => i.status === 'OPEN').length,
+    inProgress: incidents.filter(i => i.status === 'IN_PROGRESS').length,
+    critical: incidents.filter(i => i.severity === 'CRITICAL').length,
+    thisWeek: incidents.filter(i => {
+      const incidentDate = new Date(i.reportedAt);
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      return incidentDate > weekAgo;
+    }).length
+  };
 
   const handleLogout = async () => {
     try {
@@ -161,19 +182,58 @@ export function DashboardPage() {
           marginBottom: '32px'
         }}>
           {[
-            { title: 'Safety Incidents', value: '0', icon: '⚠️', color: '#ef4444', bgColor: 'rgba(239, 68, 68, 0.1)' },
-            { title: 'Active Workers', value: '124', icon: '👷', color: '#10b981', bgColor: 'rgba(16, 185, 129, 0.1)' },
-            { title: 'Inspections Due', value: '3', icon: '📋', color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.1)' },
-            { title: 'Training Complete', value: '98%', icon: '🎓', color: '#3b82f6', bgColor: 'rgba(59, 130, 246, 0.1)' },
+            { 
+              title: 'Total Incidents', 
+              value: incidentsLoading ? '...' : incidentStats.total.toString(), 
+              icon: '📊', 
+              color: '#3b82f6', 
+              bgColor: 'rgba(59, 130, 246, 0.1)',
+              onClick: () => navigate('/incidents')
+            },
+            { 
+              title: 'Open Incidents', 
+              value: incidentsLoading ? '...' : incidentStats.open.toString(), 
+              icon: '⚠️', 
+              color: '#ef4444', 
+              bgColor: 'rgba(239, 68, 68, 0.1)',
+              onClick: () => navigate('/incidents?status=OPEN')
+            },
+            { 
+              title: 'In Progress', 
+              value: incidentsLoading ? '...' : incidentStats.inProgress.toString(), 
+              icon: '🔄', 
+              color: '#f59e0b', 
+              bgColor: 'rgba(245, 158, 11, 0.1)',
+              onClick: () => navigate('/incidents?status=IN_PROGRESS')
+            },
+            { 
+              title: 'Critical Priority', 
+              value: incidentsLoading ? '...' : incidentStats.critical.toString(), 
+              icon: '🚨', 
+              color: '#dc2626', 
+              bgColor: 'rgba(220, 38, 38, 0.1)',
+              onClick: () => navigate('/incidents?severity=CRITICAL')
+            },
           ].map((stat, index) => (
             <div
               key={index}
+              onClick={stat.onClick}
               style={{
                 backgroundColor: 'white',
                 borderRadius: '12px',
                 padding: '24px',
                 boxShadow: '0 2px 4px -1px rgba(0, 0, 0, 0.1)',
-                border: `1px solid ${stat.color}20`
+                border: `1px solid ${stat.color}20`,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 8px 16px -4px rgba(0, 0, 0, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 4px -1px rgba(0, 0, 0, 0.1)';
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
@@ -212,6 +272,128 @@ export function DashboardPage() {
           ))}
         </div>
 
+        {/* Recent Incidents */}
+        {incidents.length > 0 && (
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '16px',
+            padding: '32px',
+            marginBottom: '32px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h3 style={{ 
+                fontSize: '20px', 
+                fontWeight: '600',
+                color: '#1e293b',
+                margin: 0
+              }}>
+                Recent Incidents
+              </h3>
+              <button
+                onClick={() => navigate('/incidents')}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#3b82f6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#2563eb';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#3b82f6';
+                }}
+              >
+                View All
+              </button>
+            </div>
+            
+            <div style={{ display: 'grid', gap: '16px' }}>
+              {incidents.slice(0, 3).map((incident) => (
+                <div
+                  key={incident.id}
+                  onClick={() => navigate(`/incidents/${incident.id}`)}
+                  style={{
+                    padding: '16px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f9fafb';
+                    e.currentTarget.style.borderColor = '#3b82f6';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'white';
+                    e.currentTarget.style.borderColor = '#e5e7eb';
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '8px' }}>
+                    <h4 style={{
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      color: '#1e293b',
+                      margin: 0,
+                      flex: 1
+                    }}>
+                      {incident.title}
+                    </h4>
+                    <div style={{
+                      display: 'flex',
+                      gap: '8px',
+                      marginLeft: '12px'
+                    }}>
+                      <span style={{
+                        fontSize: '10px',
+                        padding: '2px 8px',
+                        borderRadius: '12px',
+                        fontWeight: '500',
+                        backgroundColor: incident.severity === 'CRITICAL' ? '#fef2f2' :
+                                      incident.severity === 'HIGH' ? '#fff7ed' :
+                                      incident.severity === 'MEDIUM' ? '#fffbeb' : '#f0fdf4',
+                        color: incident.severity === 'CRITICAL' ? '#dc2626' :
+                              incident.severity === 'HIGH' ? '#ea580c' :
+                              incident.severity === 'MEDIUM' ? '#d97706' : '#16a34a'
+                      }}>
+                        {incident.severity}
+                      </span>
+                      <span style={{
+                        fontSize: '10px',
+                        padding: '2px 8px',
+                        borderRadius: '12px',
+                        fontWeight: '500',
+                        backgroundColor: incident.status === 'OPEN' ? '#eff6ff' :
+                                      incident.status === 'IN_PROGRESS' ? '#f3e8ff' :
+                                      incident.status === 'RESOLVED' ? '#f0fdf4' : '#f8fafc',
+                        color: incident.status === 'OPEN' ? '#2563eb' :
+                              incident.status === 'IN_PROGRESS' ? '#7c3aed' :
+                              incident.status === 'RESOLVED' ? '#16a34a' : '#64748b'
+                      }}>
+                        {incident.status.replace('_', ' ')}
+                      </span>
+                    </div>
+                  </div>
+                  <p style={{
+                    fontSize: '12px',
+                    color: '#6b7280',
+                    margin: 0,
+                    lineHeight: 1.4
+                  }}>
+                    {incident.siteName} • {new Date(incident.reportedAt).toLocaleDateString()}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Quick Actions */}
         <div style={{
           backgroundColor: 'white',
@@ -219,14 +401,32 @@ export function DashboardPage() {
           padding: '32px',
           boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
         }}>
-          <h3 style={{ 
-            fontSize: '20px', 
-            fontWeight: '600',
-            color: '#1e293b',
-            marginBottom: '24px'
-          }}>
-            Quick Actions
-          </h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <h3 style={{ 
+              fontSize: '20px', 
+              fontWeight: '600',
+              color: '#1e293b',
+              margin: 0
+            }}>
+              Quick Actions
+            </h3>
+            
+            {/* Sync Status */}
+            {outboxStatus && outboxStatus.pending > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  backgroundColor: '#f59e0b',
+                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                }} />
+                <span style={{ fontSize: '12px', color: '#f59e0b', fontWeight: '500' }}>
+                  {outboxStatus.pending} pending sync
+                </span>
+              </div>
+            )}
+          </div>
           
           <div style={{
             display: 'grid',
@@ -282,6 +482,43 @@ export function DashboardPage() {
           </div>
         </div>
       </main>
+      
+      {/* Floating Report Incident Button */}
+      <button
+        onClick={() => navigate('/incidents/new')}
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          width: '60px',
+          height: '60px',
+          backgroundColor: '#ef4444',
+          color: 'white',
+          border: 'none',
+          borderRadius: '50%',
+          fontSize: '24px',
+          cursor: 'pointer',
+          boxShadow: '0 4px 12px rgba(239, 68, 68, 0.4)',
+          transition: 'all 0.3s ease',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#dc2626';
+          e.currentTarget.style.transform = 'scale(1.1)';
+          e.currentTarget.style.boxShadow = '0 8px 20px rgba(239, 68, 68, 0.6)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = '#ef4444';
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.4)';
+        }}
+        title="Report New Incident"
+      >
+        📝
+      </button>
     </div>
   );
 }
