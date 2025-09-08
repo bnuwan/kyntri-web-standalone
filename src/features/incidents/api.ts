@@ -1,5 +1,6 @@
 import { apiClient } from '../../lib/api-client';
 import { mockSites, mockAssets, mockIncidents, mockActions, delay } from '../../lib/mock-data';
+import { supabaseIncidentsApi } from './api-supabase';
 import {
   Incident,
   IncidentCreate,
@@ -13,12 +14,16 @@ import {
   Asset
 } from './types';
 
-// Development flag - set to true for development with mock data
-const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true' || import.meta.env.DEV;
+// Configuration flags
+const USE_SUPABASE = import.meta.env.VITE_USE_SUPABASE === 'true';
+const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true' || (!USE_SUPABASE && import.meta.env.DEV);
 
 export class IncidentsApi {
   // Health check
   async health(): Promise<{ ok: boolean }> {
+    if (USE_SUPABASE) {
+      return supabaseIncidentsApi.health();
+    }
     return apiClient.get('/health');
   }
 
@@ -29,6 +34,10 @@ export class IncidentsApi {
 
   // Incidents
   async getIncidents(filters: IncidentFilters = {}): Promise<IncidentListResponse> {
+    if (USE_SUPABASE) {
+      return supabaseIncidentsApi.getIncidents(filters);
+    }
+    
     if (USE_MOCK_DATA) {
       await delay(800);
       
@@ -73,6 +82,9 @@ export class IncidentsApi {
   }
 
   async getIncident(id: string): Promise<Incident> {
+    if (USE_SUPABASE) {
+      return supabaseIncidentsApi.getIncident(id);
+    }
     if (USE_MOCK_DATA) {
       await delay(400);
       const incident = mockIncidents.find(inc => inc.id === id);
@@ -85,6 +97,9 @@ export class IncidentsApi {
   }
 
   async createIncident(incident: IncidentCreate): Promise<{ id: string; status: string }> {
+    if (USE_SUPABASE) {
+      return supabaseIncidentsApi.createIncident(incident);
+    }
     if (USE_MOCK_DATA) {
       await delay(1000);
       const newId = `incident-${Date.now()}`;
@@ -143,6 +158,9 @@ export class IncidentsApi {
 
   // Sites
   async getSites(): Promise<Site[]> {
+    if (USE_SUPABASE) {
+      return supabaseIncidentsApi.getSites();
+    }
     if (USE_MOCK_DATA) {
       await delay(500);
       return mockSites;
@@ -156,6 +174,9 @@ export class IncidentsApi {
 
   // Assets
   async getAssets(siteId?: string): Promise<Asset[]> {
+    if (USE_SUPABASE) {
+      return supabaseIncidentsApi.getAssets(siteId);
+    }
     if (USE_MOCK_DATA) {
       await delay(300);
       return siteId ? mockAssets.filter(asset => asset.siteId === siteId) : mockAssets;
@@ -173,6 +194,10 @@ export class IncidentsApi {
     file: File,
     onProgress?: (progress: number) => void
   ): Promise<{ bucketKey: string; contentType: string; size: number }> {
+    if (USE_SUPABASE) {
+      return supabaseIncidentsApi.uploadFile(file, onProgress);
+    }
+
     // Get presigned URL
     const [uploadInfo] = await this.getPresignedUploadUrls([
       { name: file.name, type: file.type, size: file.size }
@@ -199,6 +224,10 @@ export class IncidentsApi {
     onProgress?: (fileIndex: number, progress: number) => void
   ): Promise<{ bucketKey: string; contentType: string; size: number }[]> {
     if (files.length === 0) return [];
+
+    if (USE_SUPABASE) {
+      return supabaseIncidentsApi.uploadFiles(files, onProgress);
+    }
 
     // Get presigned URLs for all files
     const uploadInfos = await this.getPresignedUploadUrls(
